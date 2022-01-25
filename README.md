@@ -6,8 +6,6 @@
 
 - Spring Boot
 
-- Angular
-
 - Liquibase
 
 ### endpoints
