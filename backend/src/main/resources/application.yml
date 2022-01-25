@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost/curr_conv
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yml
+    default-schema: public
