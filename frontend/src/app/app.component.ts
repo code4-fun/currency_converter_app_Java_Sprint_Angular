@@ -1,29 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpParams } from "@angular/common/http";
 
-export interface Currencies {
-  currencies: string[]
-}
-
 export interface ConversionResult {
-  date: string
-  amount: string
-  status: string
+  dateTime: string
+  sumAfterConversion: string
 }
 
 export interface History {
   dateTime: string
   curFrom: string
   curTo: string
-  amount: string
+  sumBeforeConversion: string
   exRate: string
-  sumConverted: string
+  sumAfterConversion: string
 }
 
 export interface Stat {
   curFrom: string
   curTo: string
-  amountConverted: string
+  sumBeforeConversion: string
   averageExRate: string
 }
 
@@ -49,16 +44,13 @@ export class AppComponent implements OnInit{
   history: History[] = []
   displayStat: boolean = false
   stat: Stat[] = []
-  showBottom: boolean = false
-
 
   constructor(private http: HttpClient) {
   }
 
-
   ngOnInit(): void {
-    this.http.get<Currencies>("http://localhost:8080").subscribe(response => {
-      this.currencies = response.currencies
+    this.http.get<string[]>("http://localhost:8080").subscribe(response => {
+      this.currencies = response
     })
   }
 
@@ -106,9 +98,9 @@ export class AppComponent implements OnInit{
     this.http.get<ConversionResult>("http://localhost:8080/convert",
       {params: params})
       .subscribe(response => {
-        this.date = response.date
-        this.amount = response.amount
-    })
+        this.date = response.dateTime
+        this.amount = response.sumAfterConversion
+      })
   }
 
   showHistory() {

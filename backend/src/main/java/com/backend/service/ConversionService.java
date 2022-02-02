@@ -2,7 +2,7 @@ package com.backend.service;
 
 import com.backend.domain.Currency;
 import com.backend.domain.ExRateToRub;
-import com.backend.dto.ConversionResultDto;
+import com.backend.controller.dto.CurrencyDto;
 import java.time.LocalDateTime;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,28 +17,40 @@ public class ConversionService {
   @NonNull private final CurrencyService currencyService;
   @NonNull private final StatService statService;
 
+  /**
+   * Converts given amount of currency curFrom into currency curTo
+   * at the latest available exchange rate of the Central Bank.
+   * @param curFrom currency to convert from
+   * @param curTo currency to convert to
+   * @param amount sum or initial currency
+   * @return CurrencyDto object containing date of exchange rate and
+   * resulting amount of currency after conversion
+   */
   @Transactional
-  public ConversionResultDto convertCurrency(String curFrom, String curTo, Double amount){
+  public CurrencyDto convertCurrency(String curFrom, String curTo, Double amount){
     Currency currencyFrom = currencyService.getCurrencyByCharCode(curFrom);
     Currency currencyTo = currencyService.getCurrencyByCharCode(curTo);
+
     ExRateToRub exRateFrom = exRateToRubService
-        .getExRateToRubByCurrencyAndLatestDate(currencyFrom);
+      .getExRateToRubByCurrencyAndLatestDate(currencyFrom);
     ExRateToRub exRateTo = exRateToRubService
-        .getExRateToRubByCurrencyAndLatestDate(currencyTo);
+      .getExRateToRubByCurrencyAndLatestDate(currencyTo);
+
     if(exRateFrom.getDate().equals(exRateTo.getDate())){
       Double rateFrom = exRateFrom.getValue() / exRateFrom.getNominal();
       Double rateTo = exRateTo.getValue() / exRateTo.getNominal();
       Double crossRate = rateFrom / rateTo;
       Double result = crossRate * amount;
+
       statService.saveStatistics(currencyFrom, currencyTo, amount,
-          crossRate, LocalDateTime.now());
-      return ConversionResultDto
-          .builder()
-          .date(exRateFrom.getDate())
-          .amount(Precision.round(result, 4))
-          .status("success")
-          .build();
+        crossRate, LocalDateTime.now());
+
+      return CurrencyDto
+        .builder()
+        .dateTime(exRateFrom.getDate().toString())
+        .sumAfterConversion(Precision.round(result, 4))
+        .build();
     }
-    return ConversionResultDto.builder().status("error").build();
+    return null;
   }
 }

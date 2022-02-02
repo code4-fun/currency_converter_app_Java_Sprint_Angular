@@ -2,8 +2,7 @@ package com.backend.service;
 
 import com.backend.domain.Currency;
 import com.backend.domain.Stat;
-import com.backend.dto.HistoryDto;
-import com.backend.dto.StatisticsDto;
+import com.backend.controller.dto.CurrencyDto;
 import com.backend.repository.StatRepository;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,8 +55,8 @@ public class StatService {
    */
   public Stat getStatById(Long id) {
     return statRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("There is no statistic data " +
-            "with id=" + id));
+      .orElseThrow(() -> new EntityNotFoundException("There is no statistic data " +
+        "with id=" + id));
   }
 
   /**
@@ -84,48 +84,52 @@ public class StatService {
   public void saveStatistics(Currency curFrom, Currency curTo, Double amount,
                              Double exRate, LocalDateTime dateTime){
     Stat stat = Stat.builder()
-        .curFrom(curFrom)
-        .curTo(curTo)
-        .amount(amount)
-        .exRate(exRate)
-        .dateTime(dateTime)
-        .build();
+      .curFrom(curFrom)
+      .curTo(curTo)
+      .amount(amount)
+      .exRate(exRate)
+      .dateTime(dateTime)
+      .build();
     statRepository.save(stat);
   }
 
   /**
-   * Returns all history of currency conversions from the database.
-   * @return list of HistoryDto objects
+   * Returns the list of CurrencyDto objects, representing all the history
+   * of currency conversions.
+   * This list is used as the return value of /history endpoint.
+   * @return list of CurrencyDto objects containing the following fields:
+   * dateTime, curFrom, curTo, sumBeforeConversion, exRate, sumAfterConversion
    */
-  public List<HistoryDto> getHistory(){
+  public List<CurrencyDto> getHistory(){
     return getAllStat()
-        .stream()
-        .map(this::convertStatToHistoryDto)
-        .collect(Collectors.toList());
+      .stream()
+      .map(this::convertStatToCurrencyDto)
+      .collect(Collectors.toList());
   }
 
   /**
-   * Converts Stat instance to HistoryDto instance.
+   * Converts a Stat instance to a CurrencyDto instance to be used
+   * to generate a /history endpoint return value.
    * @param stat Stat object
-   * @return HistoryDto object
+   * @return CurrencyDto object
    */
-  private HistoryDto convertStatToHistoryDto(Stat stat){
+  private CurrencyDto convertStatToCurrencyDto(Stat stat){
     NumberFormat formatter = new DecimalFormat("#.####");
-    return HistoryDto.builder()
-        .dateTime(stat.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))
-        .curFrom(stat.getCurFrom().getCharCode())
-        .curTo(stat.getCurTo().getCharCode())
-        .amount(formatter.format(stat.getAmount()))
-        .exRate(formatter.format(stat.getExRate()))
-        .sumConverted(formatter.format(stat.getAmount() * stat.getExRate()))
-        .build();
+    return CurrencyDto.builder()
+      .dateTime(stat.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))
+      .curFrom(stat.getCurFrom().getCharCode())
+      .curTo(stat.getCurTo().getCharCode())
+      .sumBeforeConversion(Precision.round(stat.getAmount(), 4))
+      .exRate(formatter.format(stat.getExRate()))
+      .sumAfterConversion(Precision.round(stat.getAmount() * stat.getExRate(), 4))
+      .build();
   }
 
   /**
-   * Retrieves statistics data from database between two dates.
+   * Retrieves statistics data from the database between two dates.
    * @param startDateTime start date and time
    * @param endDateTime end date and time
-   * @return
+   * @return list of Stat objects
    */
   public List<Stat> getStatBetweenTwoDates(LocalDateTime startDateTime,
                                            LocalDateTime endDateTime){
@@ -133,35 +137,40 @@ public class StatService {
   }
 
   /**
-   * Returns a list of objects containing statistics for the current week.
-   * @return list of StatisticsDto objects
+   * Returns a list of CurrencyDto objects containing statistics for the current week.
+   * This list is used as the return value of /stat endpoint.
+   * @return list of CurrencyDto objects containing the following fields:
+   * curFrom, curTo, sumBeforeConversion, averageExRate
    */
-  public List<StatisticsDto> getStatistics() {
+  public List<CurrencyDto> getStatistics() {
     List<Stat> statOfCurrentWeek = getStatBetweenTwoDates(Utilities.startOfWeek(),
-        Utilities.endOfWeek());
+      Utilities.endOfWeek());
 
-    List<StatisticsDto> res = new ArrayList<>();
+    List<CurrencyDto> res = new ArrayList<>();
     while (statOfCurrentWeek.size() != 0){
-      StatisticsDto statDto = new StatisticsDto();
+      CurrencyDto currencyDto = new CurrencyDto();
+
       Stat removed = statOfCurrentWeek.remove(0);
-      statDto.setCurFrom(removed.getCurFrom().getCharCode());
-      statDto.setCurTo(removed.getCurTo().getCharCode());
-      statDto.setAmountConverted(removed.getAmount());
-      statDto.setExRateSum(removed.getExRate());
-      statDto.setCounter(1);
+
+      currencyDto.setCurFrom(removed.getCurFrom().getCharCode());
+      currencyDto.setCurTo(removed.getCurTo().getCharCode());
+      currencyDto.setSumBeforeConversion(removed.getAmount());
+      currencyDto.setExRateSum(removed.getExRate());
+      currencyDto.setCounter(1);
+
       Iterator<Stat> iterator = statOfCurrentWeek.iterator();
       while (iterator.hasNext()){
         Stat next = iterator.next();
-        if(next.getCurFrom().getCharCode().equals(statDto.getCurFrom())
-            && next.getCurTo().getCharCode().equals(statDto.getCurTo())){
-          statDto.addValueToAmountConverted(next.getAmount());
-          statDto.addValueToExRateSum(next.getExRate());
-          statDto.incrementCounter();
+        if(next.getCurFrom().getCharCode().equals(currencyDto.getCurFrom())
+          && next.getCurTo().getCharCode().equals(currencyDto.getCurTo())){
+          currencyDto.addValueToAmountConverted(next.getAmount());
+          currencyDto.addValueToExRateSum(next.getExRate());
+          currencyDto.incrementCounter();
           iterator.remove();
         }
       }
-      statDto.calculateAverageExRate();
-      res.add(statDto);
+      currencyDto.calculateAverageExRate();
+      res.add(currencyDto);
     }
     return res;
   }
