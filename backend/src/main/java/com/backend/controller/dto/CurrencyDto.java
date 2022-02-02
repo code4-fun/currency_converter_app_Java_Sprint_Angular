@@ -16,9 +16,9 @@ import org.apache.commons.math3.util.Precision;
  *   dateTime             |    +     |    +     |       |
  *   curFrom              |          |    +     |   +   |
  *   curTo                |          |    +     |   +   |
- *   exRate               |    +     |    +     |       |
+ *   exRate               |          |    +     |       |
  *   sumBeforeConversion  |          |    +     |   +   |
- *   sumAfterConversion   |          |    +     |       |
+ *   sumAfterConversion   |    +     |    +     |       |
  *   averageExRate        |          |          |   +   |
  */
 @Getter
@@ -41,7 +41,7 @@ public class CurrencyDto {
   private String curTo;
 
   @JsonView(CurrencyViews.History.class)
-  private String exRate;
+  private Double exRate;
 
   @JsonView({
     CurrencyViews.History.class,

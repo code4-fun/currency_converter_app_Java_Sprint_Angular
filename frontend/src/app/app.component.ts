@@ -50,7 +50,7 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.http.get<string[]>("http://localhost:8080").subscribe(response => {
-      this.currencies = response
+      this.currencies = response.sort((a, b) => a.localeCompare(b))
     })
   }
 

@@ -120,7 +120,7 @@ public class StatService {
       .curFrom(stat.getCurFrom().getCharCode())
       .curTo(stat.getCurTo().getCharCode())
       .sumBeforeConversion(Precision.round(stat.getAmount(), 4))
-      .exRate(formatter.format(stat.getExRate()))
+      .exRate(Precision.round(stat.getExRate(), 4))
       .sumAfterConversion(Precision.round(stat.getAmount() * stat.getExRate(), 4))
       .build();
   }
