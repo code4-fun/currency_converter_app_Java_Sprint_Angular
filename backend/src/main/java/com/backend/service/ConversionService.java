@@ -3,6 +3,10 @@ package com.backend.service;
 import com.backend.domain.Currency;
 import com.backend.domain.ExRateToRub;
 import com.backend.controller.dto.CurrencyDto;
+import com.backend.facade.service.ConversionServiceFacade;
+import com.backend.facade.service.CurrencyServiceFacade;
+import com.backend.facade.service.ExRateToRubServiceFacade;
+import com.backend.facade.service.StatServiceFacade;
 import java.time.LocalDateTime;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ConversionService {
-  @NonNull private final ExRateToRubService exRateToRubService;
-  @NonNull private final CurrencyService currencyService;
-  @NonNull private final StatService statService;
+public class ConversionService implements ConversionServiceFacade {
+  @NonNull private final ExRateToRubServiceFacade exRateToRubService;
+  @NonNull private final CurrencyServiceFacade currencyService;
+  @NonNull private final StatServiceFacade statService;
 
   /**
    * Converts given amount of currency curFrom into currency curTo

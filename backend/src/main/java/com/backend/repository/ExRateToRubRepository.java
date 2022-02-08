@@ -26,7 +26,7 @@ public interface ExRateToRubRepository extends CrudRepository<ExRateToRub, Long>
           "where currency_id = :currency " +
           "and date = " +
           "(select date from exratetorub order by date desc limit 1)")
-  List<ExRateToRub> findByCurrencyAndLatestDate(@Param("currency") Currency currency);
+  List<ExRateToRub> findByCurrencyAndLatestDate(@Param("currency") String currency);
 
   @Query(nativeQuery = true,
       value = "select * " +

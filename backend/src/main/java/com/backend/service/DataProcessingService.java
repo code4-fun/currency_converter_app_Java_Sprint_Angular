@@ -2,6 +2,9 @@ package com.backend.service;
 
 import com.backend.domain.Currency;
 import com.backend.domain.ExRateToRub;
+import com.backend.facade.service.CurrencyServiceFacade;
+import com.backend.facade.service.DataProcessingServiceFacade;
+import com.backend.facade.service.ExRateToRubServiceFacade;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,9 +18,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class DataProcessingService {
-  @NonNull CurrencyService currencyService;
-  @NonNull ExRateToRubService exRateToRubService;
+public class DataProcessingService implements DataProcessingServiceFacade {
+  @NonNull CurrencyServiceFacade currencyService;
+  @NonNull ExRateToRubServiceFacade exRateToRubService;
 
   /**
    * Parses exchange rate data from the official cbr website and
@@ -102,8 +105,8 @@ public class DataProcessingService {
    * @param name name of the currency
    * @return currency created of existing in the database
    */
-  private Currency saveCurrencyToDb(String id, String numCode,
-                                    String charCode, String name){
+  public Currency saveCurrencyToDb(String id, String numCode,
+                                         String charCode, String name){
     Currency currency = Currency
         .builder()
         .id(id)
@@ -123,7 +126,7 @@ public class DataProcessingService {
    * @param currency Currency
    * @return ExRateToRub created of existing in the database
    */
-  private ExRateToRub saveExRateToRubToDb(LocalDate dateOfRate, Long nominal,
+  public ExRateToRub saveExRateToRubToDb(LocalDate dateOfRate, Long nominal,
                                           Double value, Currency currency){
     ExRateToRub exRateToRub = ExRateToRub
         .builder()

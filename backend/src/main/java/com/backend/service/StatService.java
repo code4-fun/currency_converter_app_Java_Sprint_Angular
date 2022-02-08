@@ -1,11 +1,10 @@
 package com.backend.service;
 
+import com.backend.controller.dto.CurrencyDto;
 import com.backend.domain.Currency;
 import com.backend.domain.Stat;
-import com.backend.controller.dto.CurrencyDto;
 import com.backend.repository.StatRepository;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import com.backend.facade.service.StatServiceFacade;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class StatService {
+public class StatService implements StatServiceFacade {
   @NonNull private final StatRepository statRepository;
 
   /**
@@ -113,8 +112,7 @@ public class StatService {
    * @param stat Stat object
    * @return CurrencyDto object
    */
-  private CurrencyDto convertStatToCurrencyDto(Stat stat){
-    NumberFormat formatter = new DecimalFormat("#.####");
+  public CurrencyDto convertStatToCurrencyDto(Stat stat){
     return CurrencyDto.builder()
       .dateTime(stat.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")))
       .curFrom(stat.getCurFrom().getCharCode())
@@ -163,7 +161,7 @@ public class StatService {
         Stat next = iterator.next();
         if(next.getCurFrom().getCharCode().equals(currencyDto.getCurFrom())
           && next.getCurTo().getCharCode().equals(currencyDto.getCurTo())){
-          currencyDto.addValueToAmountConverted(next.getAmount());
+          currencyDto.addValueToSumBeforeConversion(next.getAmount());
           currencyDto.addValueToExRateSum(next.getExRate());
           currencyDto.incrementCounter();
           iterator.remove();

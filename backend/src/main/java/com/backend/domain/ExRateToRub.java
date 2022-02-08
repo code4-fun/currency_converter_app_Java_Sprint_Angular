@@ -1,5 +1,6 @@
 package com.backend.domain;
 
+import com.backend.facade.domain.ExRateToRubFacade;
 import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="exratetorub")
-public class ExRateToRub {
+public class ExRateToRub implements ExRateToRubFacade {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;

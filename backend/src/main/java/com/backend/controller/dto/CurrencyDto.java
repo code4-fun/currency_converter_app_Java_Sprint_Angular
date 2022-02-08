@@ -60,7 +60,7 @@ public class CurrencyDto {
   @JsonIgnore
   private Integer counter;
 
-  public void addValueToAmountConverted(Double value){
+  public void addValueToSumBeforeConversion(Double value){
     this.sumBeforeConversion = sumBeforeConversion + value;
   }
 

@@ -3,6 +3,8 @@ package com.backend.service;
 import com.backend.domain.Currency;
 import com.backend.domain.ExRateToRub;
 import com.backend.repository.CurrencyRepository;
+import com.backend.facade.service.CurrencyServiceFacade;
+import com.backend.facade.service.ExRateToRubServiceFacade;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
@@ -12,9 +14,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CurrencyService {
+public class CurrencyService implements CurrencyServiceFacade {
   @NonNull private final CurrencyRepository currencyRepository;
-  @NonNull private final ExRateToRubService exRateToRubService;
+  @NonNull private final ExRateToRubServiceFacade exRateToRubService;
 
   /**
    * Updates Currency object.

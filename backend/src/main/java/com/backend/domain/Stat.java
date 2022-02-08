@@ -1,5 +1,6 @@
 package com.backend.domain;
 
+import com.backend.facade.domain.StatFacade;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="stat")
-public class Stat {
+public class Stat implements StatFacade {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   private Long id;

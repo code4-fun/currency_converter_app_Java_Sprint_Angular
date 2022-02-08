@@ -1,5 +1,6 @@
 package com.backend.domain;
 
+import com.backend.facade.domain.CurrencyFacade;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="currency")
-public class Currency {
+public class Currency implements CurrencyFacade {
   @Id
   private String id;
   private String numCode;

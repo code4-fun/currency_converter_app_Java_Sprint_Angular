@@ -2,10 +2,10 @@ package com.backend.controller;
 
 import com.backend.controller.dto.CurrencyDto;
 import com.backend.controller.dto.view.CurrencyViews;
-import com.backend.service.ConversionService;
-import com.backend.service.CurrencyService;
-import com.backend.service.DataProcessingService;
-import com.backend.service.StatService;
+import com.backend.facade.service.ConversionServiceFacade;
+import com.backend.facade.service.CurrencyServiceFacade;
+import com.backend.facade.service.DataProcessingServiceFacade;
+import com.backend.facade.service.StatServiceFacade;
 import com.fasterxml.jackson.annotation.JsonView;
 import java.io.IOException;
 import java.util.List;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class MainController {
-  @NonNull private final DataProcessingService dataProcessingService;
-  @NonNull private final CurrencyService currencyService;
-  @NonNull private final ConversionService conversionService;
-  @NonNull private final StatService statService;
+  @NonNull private final DataProcessingServiceFacade dataProcessingService;
+  @NonNull private final CurrencyServiceFacade currencyService;
+  @NonNull private final ConversionServiceFacade conversionService;
+  @NonNull private final StatServiceFacade statService;
 
   @GetMapping
   public List<String> startPage() throws IOException {

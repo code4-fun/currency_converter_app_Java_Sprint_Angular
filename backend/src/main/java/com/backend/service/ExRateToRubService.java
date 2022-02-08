@@ -3,6 +3,7 @@ package com.backend.service;
 import com.backend.domain.Currency;
 import com.backend.domain.ExRateToRub;
 import com.backend.repository.ExRateToRubRepository;
+import com.backend.facade.service.ExRateToRubServiceFacade;
 import java.time.LocalDate;
 import java.util.List;
 import javax.persistence.EntityNotFoundException;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ExRateToRubService {
+public class ExRateToRubService implements ExRateToRubServiceFacade {
   @NonNull private final ExRateToRubRepository exRateToRubRepository;
 
   /**
@@ -78,9 +79,9 @@ public class ExRateToRubService {
    * @return exchange rate to ruble
    */
   public ExRateToRub getExRateToRubByCurrencyAndDate(Currency currency, LocalDate date){
-    if(exRateToRubRepository.findByCurrencyAndDate(currency, date).size() == 1
-        && !exRateToRubRepository.findByCurrencyAndDate(currency, date).isEmpty()){
-      return exRateToRubRepository.findByCurrencyAndDate(currency, date).get(0);
+    List<ExRateToRub> exRateToRub = exRateToRubRepository.findByCurrencyAndDate(currency, date);
+    if(exRateToRub.size() == 1){
+      return exRateToRub.get(0);
     } else {
       throw new EntityNotFoundException("There is no exchange rate to rub for " + currency +
           " on " + date);
@@ -93,9 +94,10 @@ public class ExRateToRubService {
    * @return exchange rate to ruble
    */
   public ExRateToRub getExRateToRubByCurrencyAndLatestDate(Currency currency){
-    if(exRateToRubRepository.findByCurrencyAndLatestDate(currency).size() == 1
-        && !exRateToRubRepository.findByCurrencyAndLatestDate(currency).isEmpty()){
-      return exRateToRubRepository.findByCurrencyAndLatestDate(currency).get(0);
+    List<ExRateToRub> exRateToRub = exRateToRubRepository
+      .findByCurrencyAndLatestDate(currency.getId());
+    if(exRateToRub.size() == 1){
+      return exRateToRub.get(0);
     } else {
       throw new EntityNotFoundException("There is no exchange rate to rub for " + currency);
     }
